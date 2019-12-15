@@ -1,7 +1,7 @@
 import pymysql
 from twisted.enterprise import adbapi
 from scrapy.utils.project import get_project_settings  #导入seetings配置
-import datetime
+from datetime import datetime
 class SpiderPipeline(object):
 
 
@@ -34,15 +34,17 @@ class SpiderPipeline(object):
     # 写入数据库中
     # SQL语句在这里
     def _conditional_insert(self, tx, item):
-        sql = "insert into position(keywords,jobId,jobTitle,jobType,jobUrl,companyId,companyUrl,companyName,salary,position,pubTime,qualification,description,industry,industryDetail,companySize,companyAddress,isEnd,createdTime,updatedTime) \
-        values(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
+        sql = "insert into `position`(keywords,spiderUrl,jobId,jobTitle,jobType,jobUrl,companyId,companyUrl,companyName,salary,position,pubTime,qualification,description,industry,industryDetail,companySize,companyAddress,isEnd,createdTime,updatedTime) \
+        values(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
 
         item['createdTime'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         item['updatedTime'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
-        params = (item['keywords'], item['jobId'], item['jobTitle'], item['jobType'],item['jobUrl'],item['companyId'],item['companyUrl'],
+        params = (item['keywords'], item['spiderUrl'], item['jobId'], item['jobTitle'], item['jobType'],item['jobUrl'],item['companyId'],item['companyUrl'],
         item['companyName'],item['salary'],item['position'],item['pubTime'],item['qualification'],item['description'],item['industry'],item['industryDetail'],
         item['companySize'],item['companyAddress'],item['isEnd'],item['createdTime'],item['updatedTime'])
+        print(sql)
+        print(params)
         tx.execute(sql, params)
 
     # 错误处理方法

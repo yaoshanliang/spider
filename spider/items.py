@@ -3,8 +3,9 @@ import scrapy
 
 class SpiderItem(scrapy.Item):
     keywords = scrapy.Field()
-    url = scrapy.Field()
+    spiderUrl = scrapy.Field()
     jobId = scrapy.Field()
+    jobUrl = scrapy.Field()
     jobTitle = scrapy.Field()
     jobType = scrapy.Field()
     companyId = scrapy.Field()
