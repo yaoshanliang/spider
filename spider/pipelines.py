@@ -2,8 +2,9 @@ import pymysql
 from twisted.enterprise import adbapi
 from scrapy.utils.project import get_project_settings  #导入seetings配置
 from datetime import datetime
+from spider.items import SpiderItem
+from twisted.internet import defer
 class SpiderPipeline(object):
-
 
     def __init__(self):
         settings = get_project_settings()  #获取settings配置，设置需要的信息
@@ -25,6 +26,9 @@ class SpiderPipeline(object):
     def connect(self):
         return self.dbpool
 
+    def close_spider(self, spider):
+        self.dbpool.close()
+
     # pipeline默认调用
     def process_item(self, item, spider):
         query = self.dbpool.runInteraction(self._conditional_insert, item)  # 调用插入的方法
@@ -43,8 +47,8 @@ class SpiderPipeline(object):
         params = (item['keywords'], item['spiderUrl'], item['jobId'], item['jobTitle'], item['jobType'],item['jobUrl'],item['companyId'],item['companyUrl'],
         item['companyName'],item['salary'],item['position'],item['pubTime'],item['qualification'],item['description'],item['industry'],item['industryDetail'],
         item['companySize'],item['companyAddress'],item['isEnd'],item['createdTime'],item['updatedTime'])
-        print(sql)
-        print(params)
+        # print(sql)
+        # print(params)
         tx.execute(sql, params)
 
     # 错误处理方法
@@ -53,3 +57,4 @@ class SpiderPipeline(object):
 
         print(failue)
 
+    
