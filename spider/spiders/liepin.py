@@ -22,7 +22,7 @@ class LiepinSpider(scrapy.Spider):
         self.db = pymysql.connect(settings['MYSQL_HOST'], settings['MYSQL_USER'], settings['MYSQL_PASSWD'], settings['MYSQL_DBNAME'])
         self.cursor = self.db.cursor()
 
-        yield scrapy.Request('https://www.liepin.com/zhaopin/?industries=&dqs=&salary=&jobKind=&pubTime=&compkind=&compscale=&industryType=&searchType=1&clean_condition=&isAnalysis=&init=1&sortFlag=15&flushckid=0&fromSearchBtn=1&headckid=86e340b5c4d42b08&d_headId=243d5e0a38dfec3c3052f8697268e14d&d_ckId=e0c94c87defa15a17beaf540e76752d7&d_sfrom=search_fp_nvbar&d_curPage=0&d_pageSize=40&siTag=1B2M2Y8AsgTpgAmY7PhCfg%7ENw_YksyhAxvGdx7jL2ZbaQ&key=' + self.keyword)
+        yield scrapy.Request('https://www.liepin.com/zhaopin/?industries=&dqs=&salary=&jobKind=&pubTime=&compkind=&compscale=&industryType=&searchType=1&clean_condition=&isAnalysis=&init=1&sortFlag=15&flushckid=0&fromSearchBtn=1&headckid=86e340b5c4d42b08&d_headId=243d5e0a38dfec3c3052f8697268e14d&d_ckId=e0c94c87defa15a17beaf540e76752d7&d_sfrom=search_fp_nvbar&d_curPage=27&d_pageSize=40&siTag=1B2M2Y8AsgTpgAmY7PhCfg%7ENw_YksyhAxvGdx7jL2ZbaQ&key=' + self.keyword)
 
     def parse(self, response):
         job_list = response.css('.sojob-list li')
@@ -73,11 +73,14 @@ class LiepinSpider(scrapy.Spider):
                 callback=self.parse)
 
     def detail(self, response):
+
         if (response.css('.job-offline-container p::text').extract_first() == '该职位已暂停招聘'):
             print('该职位已暂停招聘')
             return;
 
         item = response.meta
+        print(item['jobUrl'])
+
 
         item['jobTitle'] = response.css('.about-position .title-info h1::text').extract_first()
 
@@ -86,14 +89,20 @@ class LiepinSpider(scrapy.Spider):
             item['companyUrl'] = response.css('.about-position .title-info h3 a::attr(href)').extract_first()
             companyUrlArray = item['companyUrl'].split('/')
             item['companyId'] = companyUrlArray[- 2]
-            companySize = response.css('.right-blcok-post .new-compintro li:nth-child(2)::text').extract_first()
-            if (companySize[0:4] == '公司规模'):
-                item['companySize'] = companySize[5:]
-                item['companyAddress'] = response.css('.right-blcok-post .new-compintro li:nth-child(3)::text').extract_first()[5:]
-            if (companySize[0:4] == '公司地址'):
-                item['companySize'] = ''
-                item['companyAddress'] = companySize[5:]
             item['industry'] = response.css('.right-blcok-post .new-compintro li:nth-child(1) a::text').extract_first()
+
+            companySize = response.css('.right-blcok-post .new-compintro li:nth-child(2)::text').extract_first()
+            if (companySize):
+                if (companySize[0:4] == '公司规模'):
+                    item['companySize'] = companySize[5:]
+                    item['companyAddress'] = response.css('.right-blcok-post .new-compintro li:nth-child(3)::text').extract_first()[5:]
+                if (companySize[0:4] == '公司地址'):
+                    item['companySize'] = ''
+                    item['companyAddress'] = companySize[5:]
+            else:
+                item['companySize'] = ''
+                item['companyAddress'] = ''
+
             item['salary'] = response.css('.about-position .job-title-left .job-item-title::text').extract_first().split()[0]
             item['position'] = response.css('.about-position .job-title-left .basic-infor span a::text').extract_first()
             item['qualification'] = response.css('.about-position .job-item .job-qualifications span::text').extract_first()
