@@ -17,7 +17,6 @@ class SpiderItem(scrapy.Item):
     qualification = scrapy.Field()
     description = scrapy.Field()
     industry = scrapy.Field()
-    industryDetail = scrapy.Field()
     companySize = scrapy.Field()
     companyAddress = scrapy.Field()
     isEnd = scrapy.Field()

@@ -16,6 +16,7 @@ class LiepinSpider(scrapy.Spider):
     name = 'liepin'
 
     def start_requests(self):
+        self.keyword = ' '.join(self.keyword.split('+'))
         settings = get_project_settings()  #获取settings配置，设置需要的信息
 
         self.db = pymysql.connect(settings['MYSQL_HOST'], settings['MYSQL_USER'], settings['MYSQL_PASSWD'], settings['MYSQL_DBNAME'])
@@ -60,10 +61,6 @@ class LiepinSpider(scrapy.Spider):
             else :
                 item['jobUrl'] = "https://www.liepin.com" + detail_url
                 item['jobType'] = '猎头'
-            
-            item['industry'] = job.css(".field-financing span a::text").extract_first()
-            if (item['industry'] == ''):
-                item['industry'] = job.css(".field-financing span::text").extract_first().strip()
 
             yield scrapy.Request(url=item['jobUrl'], callback=self.detail, meta=item)
 
@@ -96,7 +93,7 @@ class LiepinSpider(scrapy.Spider):
             if (companySize[0:4] == '公司地址'):
                 item['companySize'] = ''
                 item['companyAddress'] = companySize[5:]
-            item['industryDetail'] = response.css('.right-blcok-post .new-compintro li:nth-child(1) a::text').extract_first()
+            item['industry'] = response.css('.right-blcok-post .new-compintro li:nth-child(1) a::text').extract_first()
             item['salary'] = response.css('.about-position .job-title-left .job-item-title::text').extract_first().split()[0]
             item['position'] = response.css('.about-position .job-title-left .basic-infor span a::text').extract_first()
             item['qualification'] = response.css('.about-position .job-item .job-qualifications span::text').extract_first()
@@ -108,7 +105,7 @@ class LiepinSpider(scrapy.Spider):
             item['companyId'] = ''
             item['companySize'] = response.css('.content-word li:nth-child(6)::text').extract_first()
             item['companyAddress'] = ''
-            item['industryDetail'] = response.css('.content-word li:nth-child(3) a::text').extract_first()
+            item['industry'] = response.css('.content-word li:nth-child(3) a::attr(title)').extract_first()
             item['salary'] = response.css('.about-position .job-title-left .job-main-title::text').extract_first().split()[0]
             item['position'] = response.css('.about-position .job-title-left .basic-infor span::text').extract_first()
             item['qualification'] = response.css('.about-position .resume span::text').extract_first()
