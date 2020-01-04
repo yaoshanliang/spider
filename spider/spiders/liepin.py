@@ -2,7 +2,7 @@
 import scrapy
 
 from urllib import parse as urlparse
-from spider.items import SpiderItem
+from spider.items import LiepinItem
 from spider.pipelines import SpiderPipeline
 from scrapy.utils.project import get_project_settings  #导入seetings配置
 import pymysql
@@ -25,9 +25,10 @@ class LiepinSpider(scrapy.Spider):
         yield scrapy.Request('https://www.liepin.com/zhaopin/?industries=&dqs=&salary=&jobKind=&pubTime=&compkind=&compscale=&industryType=&searchType=1&clean_condition=&isAnalysis=&init=1&sortFlag=15&flushckid=0&fromSearchBtn=1&headckid=86e340b5c4d42b08&d_headId=243d5e0a38dfec3c3052f8697268e14d&d_ckId=e0c94c87defa15a17beaf540e76752d7&d_sfrom=search_fp_nvbar&d_curPage=27&d_pageSize=40&siTag=1B2M2Y8AsgTpgAmY7PhCfg%7ENw_YksyhAxvGdx7jL2ZbaQ&key=' + self.keyword)
 
     def parse(self, response):
+
         job_list = response.css('.sojob-list li')
 
-        item = SpiderItem()
+        item = LiepinItem()
         item['keywords'] = self.keyword
         item['spiderUrl'] = response.url
 
