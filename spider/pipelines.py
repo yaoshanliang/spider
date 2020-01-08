@@ -31,8 +31,8 @@ class SpiderPipeline(object):
 
     # pipeline默认调用
     def process_item(self, item, spider):
-        query = self.dbpool.runInteraction(self._conditional_insert, item)  # 调用插入的方法
-        query.addErrback(self._handle_error, item, spider)  # 调用异常处理方法
+        # query = self.dbpool.runInteraction(self._conditional_insert, item)  # 调用插入的方法
+        # query.addErrback(self._handle_error, item, spider)  # 调用异常处理方法
         return item
 
     # 写入数据库中
