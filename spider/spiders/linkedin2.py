@@ -14,8 +14,8 @@ import re
 from http.cookies import SimpleCookie
 
 
-class LinkedinSpider(scrapy.Spider):
-    name = 'linkedin'
+class Linkedin2Spider(scrapy.Spider):
+    name = 'linkedin2'
 
     def start_requests(self):
         self.keyword = ' '.join(self.keyword.split('+'))
